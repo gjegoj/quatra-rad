@@ -7,7 +7,7 @@ class Model(torch.nn.Module):
         super(Model, self).__init__()
         self.n_classes = n_classes
         
-        self.base_model = EfficientNet.from_pretrained('efficientnet-b1', num_classes=self.n_classes)
+        self.base_model = EfficientNet.from_pretrained('efficientnet-b3', num_classes=self.n_classes, dropout_rate=0.2)
 
     def forward(self, x):
         logits = self.base_model(x)

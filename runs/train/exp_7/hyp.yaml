@@ -1,0 +1,93 @@
+PROJECT: runs\train\exp
+NAME: EffNetB3_BatchSize16_ImageSize224_CutOut_LabelSmoothing
+TRANSFORMS:
+  ARGS:
+    mean:
+    - 0.485
+    - 0.456
+    - 0.406
+    std:
+    - 0.229
+    - 0.224
+    - 0.225
+    image_size:
+    - 224
+    - 224
+TRAINER:
+  GPU:
+  - 0
+  MIN_EPOCHS: 1
+  MAX_EPOCHS: 300
+  CHECK_VAL_EVERY_N_EPOCH: 1
+  SHOW_PROGRESS_BAR: true
+MODEL:
+  NAME: resnet18
+  PRETRAINED:
+    ENABLE: false
+    WEIGHTS: ''
+    STRICT_LOAD: false
+TRAIN:
+  DATASET:
+    ARGS:
+      imgs_path: data/downloaded_data/
+      anno_path: data/annotation/data.xlsx
+      is_train: true
+  DATALOADER:
+    ARGS:
+      batch_size: 16
+      shuffle: true
+      drop_last: true
+      num_workers: 4
+      pin_memory: true
+VAL:
+  DATASET:
+    ARGS:
+      imgs_path: data/downloaded_data/
+      anno_path: data/annotation/data.xlsx
+      is_train: false
+  DATALOADER:
+    ARGS:
+      batch_size: 16
+      shuffle: false
+      drop_last: false
+      num_workers: 4
+      pin_memory: true
+OPTIMIZER:
+  NAME: AdamW
+  ARGS:
+    lr: 0.001
+    betas:
+    - 0.9
+    - 0.999
+    eps: 1.0e-08
+    weight_decay: 1.0e-05
+    amsgrad: false
+SCHEDULER:
+  NAME: CyclicLR
+  ARGS:
+    base_lr: 1.0e-05
+    max_lr: 0.001
+    step_size_up: 5
+    step_size_down: 15
+    mode: exp_range
+    gamma: 0.9
+    scale_mode: cycle
+    cycle_momentum: false
+    base_momentum: 0.8
+    max_momentum: 0.99
+    last_epoch: -1
+CHECKPOINTS:
+  ARGS:
+    save_weights_only: true
+    verbose: true
+    monitor: val_loss
+    period: 1
+    mode: min
+    prefix: ''
+CUDNN:
+  BENCHMARK: false
+  DETERMINISTIC: false
+REPRODUCIBILITY:
+  ENABLE: true
+  TORCH_SEED: 42
+  NUMPY_SEED: 42

@@ -14,7 +14,7 @@ import torch.optim.lr_scheduler as lr_scheduler
 from src.utils.plot import plot, plot_confusion_matrix
 from src.models import resnet18, resnet34, effnet
 from src.dataset.dataset import JapanItemsDataset
-from src.dataset.transforms import train_transform, val_transform
+from src.dataset.transforms import train_transforms, val_transforms
 
 import pytorch_lightning as pl
 from pytorch_lightning import Trainer
@@ -65,8 +65,8 @@ class Lightning(pl.LightningModule):
         criterion = torch.nn.CrossEntropyLoss(label_smoothing=0.1)
         return criterion(logits, targets)
 
-    def _plot(self, img, targets, preds, n_images):
-        return plot(img, targets, preds, n_images)
+    def _plot(self, img, targets, preds, n_images, image_size):
+        return plot(img, targets, preds, n_images, image_size)
 
     def _plot_confusion_matrix(self, targets, preds):
         return plot_confusion_matrix(targets, preds)
@@ -93,7 +93,9 @@ class Lightning(pl.LightningModule):
                                                             x.detach().cpu().numpy(),
                                                             targets.detach().cpu().numpy(),
                                                             preds.detach().cpu().numpy(),
-                                                            32),
+                                                            32,
+                                                            self.cfg['TRANSFORMS']['ARGS']['image_size']
+                                                            ),
                                                   global_step=self.current_epoch
                                                   )
 
@@ -117,7 +119,9 @@ class Lightning(pl.LightningModule):
                                                             x.detach().cpu().numpy(),
                                                             targets.detach().cpu().numpy(),
                                                             preds.detach().cpu().numpy(),
-                                                            32),
+                                                            32,
+                                                            self.cfg['TRANSFORMS']['ARGS']['image_size']
+                                                            ),
                                                   global_step=self.current_epoch
                                                   )
 
@@ -161,14 +165,19 @@ class Lightning(pl.LightningModule):
                 'log': {'val_loss': val_loss_mean, 'val_acc': soft_acc_mean}}
 
     def train_dataloader(self):
-        dataset = JapanItemsDataset(transform=train_transform, 
-                                    **self.cfg['TRAIN']['DATASET']['ARGS'])
+        dataset = JapanItemsDataset(
+                                    transform=train_transforms(**self.cfg['TRANSFORMS']['ARGS']), 
+                                    **self.cfg['TRAIN']['DATASET']['ARGS']
+                                    )
 
         return DataLoader(dataset, **self.cfg['TRAIN']['DATALOADER']['ARGS'])
 
     def val_dataloader(self):
-        dataset = JapanItemsDataset(transform=val_transform, 
-                                    **self.cfg['VAL']['DATASET']['ARGS'])
+        dataset = JapanItemsDataset(
+                                    transform=val_transforms(**self.cfg['TRANSFORMS']['ARGS']), 
+                                    **self.cfg['VAL']['DATASET']['ARGS']
+                                    )
+
 
         return DataLoader(dataset, **self.cfg['VAL']['DATALOADER']['ARGS'])
 
@@ -226,8 +235,8 @@ if __name__ == '__main__':
     with open(str(save_dir) + '/hyp.yaml', 'w') as f:
         yaml.dump(cfg, f, sort_keys=False)
 
-    base_model = resnet18.Model()
-    # base_model = effnet.Model()
+    # base_model = resnet18.Model()
+    base_model = effnet.Model()
 
 
     if cfg['MODEL']['PRETRAINED']['ENABLE']:

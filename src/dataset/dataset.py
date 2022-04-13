@@ -79,7 +79,7 @@ if __name__ == '__main__':
     dataset = JapanItemsDataset(imgs_path='data/downloaded_data/',
                                 anno_path='data/annotation/data.xlsx',
                                 is_train=True, 
-                                transform=train_transform)
+                                transform=train_transforms())
 
     # Transform from tensor to numpy array
     def transform_img(img):

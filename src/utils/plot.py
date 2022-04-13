@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.metrics import ConfusionMatrixDisplay
-from sklearn.metrics import confusion_matrix
+import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
 
 
 CLASSES = {0: 'bottle', 1: 'glass', 2: 'packet'}
@@ -15,9 +17,9 @@ def transform_img(img, STD=(0.229, 0.224, 0.225), MEAN=(0.485, 0.456, 0.406)):
     return img
 
 
-def plot(img, targets, preds, n_images):
+def plot(img, targets, preds, n_images, image_size):
     img = transform_img(img).transpose((0, 3, 1, 2)).astype(np.float32)[:n_images] #  First n images from batch
-    text_img = (np.ones((n_images, 64, 224, 3))).astype(np.float32)
+    text_img = (np.ones((n_images, 64, image_size[1], 3))).astype(np.float32)
     for i, t_img in enumerate(text_img):
         
         if targets[i] == preds[i]:
@@ -64,3 +66,48 @@ def plot_confusion_matrix(targets, preds):
     return data
 
 
+def plot_roc_curve(one_hot_targets, preds_probs, classes=CLASSES, save_path='docs/roc.jpg'):
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    for i in range(len(classes)):
+        fpr[i], tpr[i], _ = roc_curve(np.array(one_hot_targets)[:, i], np.array(preds_probs)[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+
+    # Plot of a ROC curve for a specific class
+    for i in range(len(classes)):
+        plt.plot(fpr[i], tpr[i], label=f'ROC curve for {classes[i]} (area = {roc_auc[i]:2f})')
+        plt.plot([0, 1], [0, 1], 'k--')
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('Receiver operating characteristic example')
+        plt.legend(loc="lower right")
+
+    plt.savefig(save_path)
+    plt.close()
+
+
+def plot_clf_report(targets, predicts, classes=CLASSES, save_path='docs/clf_report.jpg'):
+
+    # Plot of classification report
+    clf_report = classification_report(
+                                        targets, 
+                                        predicts, 
+                                        target_names=classes.values(), 
+                                        output_dict=True
+                                        )
+
+    ax = sns.heatmap(
+                pd.DataFrame(clf_report).iloc[:-1, :].T, 
+                annot=True, 
+                cmap='Blues', 
+                )
+
+    # x axis on top
+    ax.xaxis.tick_top() 
+    ax.xaxis.set_label_position('top')
+
+    plt.savefig(save_path)
+    plt.close()

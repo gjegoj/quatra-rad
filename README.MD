@@ -43,3 +43,10 @@ In TensorBoard, we can track loss, accuracy, and draw correct and incorrect mode
 ```
 $ python --jit_path <path_to_jit_model.jit> --image_path <path_to_image> inference.py
 ```
+
+## Results
+
+For multiclass classification, useful metrics are Precision, Recall, F1 Score, ROC_AUC.
+
+<img src="./docs/clf_report.jpg" width="50%" />
+<img src="./docs/roc.jpg" width="50%" />

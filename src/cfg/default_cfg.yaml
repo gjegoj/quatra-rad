@@ -2,13 +2,20 @@
 
 # PROJECT
 PROJECT: 'runs\train\exp'
-NAME: 'ResNet18_ImageSize224_CutOut_LabelSmoothing' 
+NAME: 'EffNetB3_BatchSize48_ImageSize128_CutOut_LabelSmoothing_DropOut0.2' 
+
+# AUGMENTATION PARAMS
+TRANSFORMS:
+  ARGS:
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    image_size: [128, 128]
 
 # TRAINER
 TRAINER:
   GPU: [0]
   MIN_EPOCHS: 1
-  MAX_EPOCHS: 50
+  MAX_EPOCHS: 300
   CHECK_VAL_EVERY_N_EPOCH: 1
   SHOW_PROGRESS_BAR: True
 
@@ -30,7 +37,7 @@ TRAIN:
 
   DATALOADER:
     ARGS:
-      batch_size: 64
+      batch_size: 48
       shuffle: True
       drop_last: True
       num_workers: 4
@@ -46,7 +53,7 @@ VAL:
 
   DATALOADER:
     ARGS:
-      batch_size: 64
+      batch_size: 48
       shuffle: False
       drop_last: False
       num_workers: 4

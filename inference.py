@@ -2,7 +2,7 @@ import cv2
 import torch
 import argparse
 from pathlib import Path
-from src.dataset.transforms import val_transform
+from src.dataset.transforms import val_transforms
 
 
 ROOT = Path(__file__).resolve().parents[0]
@@ -26,7 +26,7 @@ def parse_args():
 def inference(image_path, model):
 
     image = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
-    image = val_transform(image=image)['image']
+    image = val_transforms()(image=image)['image']
 
     with torch.no_grad():
         logits = model(image.unsqueeze(0))

@@ -6,14 +6,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(ROOT)) if str(ROOT) not in sys.path else None
 
-from src.models import resnet18
+from src.models import resnet18, effnet
 
 JIT_PATH = ROOT / 'jit'
-JIT_NAME = 'ResNet18.jit'
-WEIGHTS = ROOT / 'runs/train/exp_5/weights/epoch=19.ckpt'
+JIT_NAME = 'EffNetB3.jit'
+WEIGHTS = ROOT / 'runs/train/exp_7/weights/epoch=103.ckpt'
 
 # Load model
-base_model = resnet18.Model()
+# base_model = resnet18.Model()
+base_model = effnet.Model(set_swith=False)
 
 # Load weights
 print(f"Loading from checkpoint: {WEIGHTS}")

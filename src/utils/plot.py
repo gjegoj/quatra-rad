@@ -1,8 +1,10 @@
 import cv2
+import torch
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from torchvision.utils import make_grid
 from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
@@ -110,4 +112,12 @@ def plot_clf_report(targets, predicts, classes=CLASSES, save_path='docs/clf_repo
     ax.xaxis.set_label_position('top')
 
     plt.savefig(save_path)
+    plt.close()
+
+
+def plot_errors(er_img, er_targets, er_preds, save_path='docs/prediction_errors.jpg'):
+    ax = plot(er_img, er_targets, er_preds, len(er_img), er_img[0].shape[1:])
+
+    grid_img = make_grid(torch.tensor(ax), nrow=7).permute(1, 2, 0)
+    plt.imsave(save_path, grid_img.numpy())
     plt.close()

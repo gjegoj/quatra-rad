@@ -1,19 +1,17 @@
 import torch
 import argparse
 import numpy as np
-import pandas as pd
-import seaborn as sns
 from pathlib import Path
-import matplotlib.pyplot as plt
 from src.dataset.transforms import val_transforms
 from src.dataset.dataset import JapanItemsDataset 
-from src.utils.plot import plot_roc_curve, plot_clf_report
-from sklearn.metrics import classification_report
+from src.utils.plot import plot_roc_curve, plot_clf_report, plot_errors
 
 
 ROOT = Path(__file__).resolve().parents[0]
 CLASSES = {0: 'bottle', 1: 'glass', 2: 'packet'}
-JIT_PATH = ROOT / 'jit/ResNet18.jit'
+JIT_PATH = ROOT / 'jit/EffNetB3.jit'
+# JIT_PATH = ROOT / 'jit/ResNet18.jit'
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -34,6 +32,9 @@ targets, predicts  = [], []
 
 preds_probs, one_hot_targets = [], []
 
+errors = []
+errors_targets, errors_preds = [], []
+
 with torch.no_grad():
     for image, target in dataset:
         logits = base_model(image.unsqueeze(0))
@@ -49,6 +50,18 @@ with torch.no_grad():
         one_hot_targets.append(one_hot_target)
         preds_probs.append(probs.tolist()[0])
 
+        if int(target) != int(preds):
+            errors.append(image.numpy())
+            errors_targets.append(int(target))
+            errors_preds.append(int(preds))
+
+
+plot_errors(
+            np.array(errors), 
+            np.array(errors_targets), 
+            np.array(errors_preds),
+            save_path='docs/prediction_errors.jpg'
+            )
 
 plot_roc_curve(
                 np.array(one_hot_targets), 

@@ -50,3 +50,7 @@ For multiclass classification, useful metrics are Precision, Recall, F1 Score, R
 
 <img src="./docs/clf_report.jpg" width="50%" />
 <img src="./docs/roc.jpg" width="50%" />
+
+We can also look at prediction errors
+
+<img src="./docs/prediction_errors.jpg" width="50%" />

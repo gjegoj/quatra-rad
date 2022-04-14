@@ -54,3 +54,9 @@ For multiclass classification, useful metrics are Precision, Recall, F1 Score, R
 We can also look at prediction errors
 
 <img src="./docs/prediction_errors.jpg" width="50%" />
+
+What conclusions we can do:
+
+1. Most likely we have errors in the annotation.
+2. We have hard samples where pictures is too zoomed.
+3. We have samples where imagened 2 or more objects.
